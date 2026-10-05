@@ -10,6 +10,13 @@ test   :; forge test -vvv --no-match-contract DeploymentsGasLimits
 test-contract :; forge test --match-contract ${filter} -vvv
 test-watch   :; forge test --watch -vvv --no-match-contract DeploymentsGasLimits
 
+# Read-only browser explorer
+.PHONY: app app-check
+app :;
+	python3 -m http.server 4173 --directory app
+app-check :;
+	node --check app/app.js
+
 # Coverage
 coverage-base :; forge coverage --fuzz-runs 50 --report lcov --no-match-coverage "(scripts|tests|deployments|mocks)"
 coverage-clean :; lcov --rc derive_function_end_line=0 --remove ./lcov.info -o ./lcov.info.p \

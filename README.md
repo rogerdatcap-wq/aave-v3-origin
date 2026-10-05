@@ -13,6 +13,35 @@ If you're interested in contributing, please read the [contributing docs](/.gith
 
 <br>
 
+## Development workflows
+
+### Read-only protocol explorer
+
+Run `make app` and open [http://localhost:4173](http://localhost:4173) to start the browser UI.
+Connect an EVM wallet on the network you want to inspect, then load that market using its
+verified Pool Addresses Provider address. Ethereum Mainnet is prefilled; other networks need
+their own Addresses Provider address. The UI reads the Pool and its reserve token metadata, and
+does not send transactions.
+
+The explorer is a dependency-free static app in [`app/`](./app/). Stop the local server with
+`Ctrl+C`. Use a local chain or testnet for future transaction workflows, and independently
+verify all contract addresses before connecting a wallet.
+
+### Solidity coverage
+
+Run `make coverage` to generate the Foundry coverage report and badge. The target runs the
+coverage tests, removes the project’s excluded files from the LCOV report, generates the HTML
+report, and writes the badge to `report/coverage.svg`.
+
+This workflow requires Foundry, `lcov`, `genhtml`, and `wget`. The intermediate LCOV files are
+written to `lcov.info` and `lcov.info.p`; the HTML report is written to `report/`.
+
+The `.solcover.js` configuration used by `solidity-coverage` is for a Hardhat-based workflow.
+This repository uses Foundry and does not define the npm `test` or `compile` scripts referenced
+by that configuration, so use `make coverage` here instead.
+
+<br>
+
 ## Documentation
 
 - [Aave v3 technical Paper](./docs/Aave_V3_Technical_Paper.pdf)
