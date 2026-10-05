@@ -53,6 +53,12 @@ contract WrappedTokenGatewayTests is TestnetProcedures {
     assertEq(wrappedTokenGatewayV3.getWETHAddress(), tokenList.weth);
   }
 
+  function test_revertIfPoolAddressIsWrong() public {
+    vm.prank(alice);
+    vm.expectRevert('INVALID_POOL');
+    wrappedTokenGatewayV3.depositETH{value: 1 ether}(address(0x1234), alice, 0);
+  }
+
   function test_depositNativeEthInPool() public {
     vm.startPrank(alice);
     vm.expectEmit();

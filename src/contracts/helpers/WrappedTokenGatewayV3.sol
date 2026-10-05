@@ -42,7 +42,8 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param onBehalfOf address of the user who will receive the aTokens representing the deposit
    * @param referralCode integrators are assigned a referral code and can potentially receive rewards.
    **/
-  function depositETH(address, address onBehalfOf, uint16 referralCode) external payable override {
+  function depositETH(address pool, address onBehalfOf, uint16 referralCode) external payable override {
+    _validatePool(pool);
     WETH.deposit{value: msg.value}();
     POOL.deposit(address(WETH), msg.value, onBehalfOf, referralCode);
   }
@@ -52,7 +53,8 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param amount amount of aWETH to withdraw and receive native ETH
    * @param to address of the user who will receive native ETH
    */
-  function withdrawETH(address, uint256 amount, address to) external override {
+  function withdrawETH(address pool, uint256 amount, address to) external override {
+    _validatePool(pool);
     IAToken aWETH = IAToken(POOL.getReserveAToken(address(WETH)));
     uint256 userBalance = aWETH.balanceOf(msg.sender);
     uint256 amountToWithdraw = amount;
@@ -74,7 +76,8 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param amount the amount to repay, or uint256(-1) if the user wants to repay everything
    * @param onBehalfOf the address for which msg.sender is repaying
    */
-  function repayETH(address, uint256 amount, address onBehalfOf) external payable override {
+  function repayETH(address pool, uint256 amount, address onBehalfOf) external payable override {
+    _validatePool(pool);
     uint256 paybackAmount = IERC20(POOL.getReserveVariableDebtToken(address(WETH))).balanceOf(
       onBehalfOf
     );
@@ -100,7 +103,8 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param amount the amount of ETH to borrow
    * @param referralCode integrators are assigned a referral code and can potentially receive rewards
    */
-  function borrowETH(address, uint256 amount, uint16 referralCode) external override {
+  function borrowETH(address pool, uint256 amount, uint16 referralCode) external override {
+    _validatePool(pool);
     POOL.borrow(
       address(WETH),
       amount,
@@ -122,7 +126,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param permitS S parameter of ERC712 permit sig
    */
   function withdrawETHWithPermit(
-    address,
+    address pool,
     uint256 amount,
     address to,
     uint256 deadline,
@@ -130,6 +134,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
     bytes32 permitR,
     bytes32 permitS
   ) external override {
+    _validatePool(pool);
     IAToken aWETH = IAToken(POOL.getReserveAToken(address(WETH)));
     uint256 userBalance = aWETH.balanceOf(msg.sender);
     uint256 amountToWithdraw = amount;
@@ -148,6 +153,10 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
     POOL.withdraw(address(WETH), amountToWithdraw, address(this));
     WETH.withdraw(amountToWithdraw);
     _safeTransferETH(to, amountToWithdraw);
+  }
+
+  function _validatePool(address pool) internal view {
+    require(pool == address(POOL), 'INVALID_POOL');
   }
 
   /**
