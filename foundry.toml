@@ -58,4 +58,4 @@ monad="${RPC_MONAD}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 1 }
-# See more config options https://github.com/gakonst/foundry/tree/master/config
+# See more config options https://github.com/foundry/tree/master/config
