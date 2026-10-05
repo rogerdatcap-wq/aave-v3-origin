@@ -15,6 +15,23 @@ If you're interested in contributing, please read the [contributing docs](/.gith
 
 ## Development workflows
 
+### Docker
+
+Build the Foundry test image and run the default test suite:
+
+```bash
+docker build -t aave-v3-origin .
+docker run --rm aave-v3-origin
+```
+
+The image runs `forge test -vvv --no-match-contract DeploymentsGasLimits` by default.
+To run another Forge command against the current working tree without rebuilding the image,
+mount the repository and pass the Forge arguments:
+
+```bash
+docker run --rm -v "$PWD:/workspace" aave-v3-origin build
+```
+
 ### Read-only protocol explorer
 
 Run `make app` and open [http://localhost:4173](http://localhost:4173) to start the browser UI.
@@ -179,7 +196,9 @@ In addition, Enigma Dark has adapted the Foundry-based fuzzing [invariant suite]
 
 ### Bug bounty
 
-This repository will be subjected to [this bug bounty](https://immunefi.com/bounty/aave/) once the Aave Governance upgrades the smart contracts in the applicable production instances.
+This repository will be subjected to [this bug bounty](https://immunefi.com/$$
+bounty
+$$/aave/) once the Aave Governance upgrades the smart contracts in the applicable production instances.
 
 <br>
 
