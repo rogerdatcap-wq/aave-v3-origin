@@ -156,7 +156,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
   }
 
   function _validatePool(address pool) internal view {
-    require(pool == address(POOL), 'INVALID_POOL');
+    require(pool == address(0) || pool == address(POOL), 'INVALID_POOL');
   }
 
   /**
