@@ -18,7 +18,6 @@ Formal properties in natural language describing the v3.6 features.
 An asset can be enabled as collateral under the following conditions inside an eMode:
 
 1. **Reserve-based eligibility:**
-
    - `reserve.lt != 0`
    - `reserve.ltv != 0`
    - `eMode.collateralBitmap` is **disabled**
@@ -34,7 +33,6 @@ If either condition is met, the asset can be enabled as collateral. In all other
 The `ltvZero` rules apply under the following conditions inside an eMode:
 
 1. **Reserve-based trigger:**
-
    - `ltv == 0`
    - `eMode.collateralBitmap` is **disabled**
 
