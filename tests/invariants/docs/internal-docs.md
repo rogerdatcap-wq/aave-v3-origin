@@ -3,37 +3,31 @@
 ## Table of Contents
 
 1. [Running the Suite](#running-the-suite)
-
    - Prerequisites
    - Starting the Suite
    - Configurations
 
 2. [Property Formats](#property-formats)
-
    - Invariants
    - Postconditions
      - Global Postconditions (GPOST)
      - Handler-Specific Postconditions (HSPOST)
 
 3. [Handlers: Adding Support for New Functions](#handlers-adding-support-for-new-functions)
-
    - Overview
    - Adding New Functions
    - Testing New Functions
 
 4. [Migrating Tests from Foundry](#migrating-tests-from-foundry)
-
    - Overview
    - Migration Steps
 
 5. [Migrating Certora Properties](#migrating-certora-properties)
-
    - Overview
    - Property Mapping
    - Migration Guide
 
 6. [Debugging Broken Properties](#debugging-broken-properties)
-
    - Logging & Output
    - Crytic to Foundry Test Helper
    - Steps to Reproduce an Echidna Error Inside the Foundry Wrapper
@@ -41,7 +35,6 @@
 ## Running the Suite
 
 - **Prerequisites**:
-
   - Ensure that all protocol dependencies have been installed:
 
     ```sh
@@ -55,7 +48,6 @@
   <br />
 
 - **Starting the Suite**: The suite is able to check the invariants and postconditions of the Aave v3 protocol. For that it uses two different modes, property mode and assertion mode respectively.
-
   - **Property Mode**: Checks protocol invariants. Run with:
     ```sh
     make echidna
@@ -74,7 +66,6 @@
   <br />
 
 - **Configurations**: The suite configuration can be found in the [echidna_config.yaml](../_config/echidna_config.yaml) file. This file contains the configuration for the Echidna testing tool, the following are the most important parameters of the configuration:
-
   - **seqLen**: Defines the number of calls in each test sequence.
   - **maxDepth**: Sets the total number of test sequences to execute.
   - **coverage**: Enables coverage tracking, stored in the directory specified by `corpusDir`.
@@ -91,7 +82,6 @@ As mentioned on the public documentation this suite framework spins around to ty
 
 - **Definition**: Invariants are properties that must hold true across all states of the system. These are checked when the tool runs under property-mode, making echidna call all public functions starting with `echidna_` and making sure the assertions in those do not fail. These checks happen in between every call inside test sequences.
 - **Example**: BASE_INVARIANT_A
-
   - **Spec**: debtToken totalSupply should be equal to the sum of all user balances (user debt).
   - **Implementation**: `BaseInvariants::assert_BASE_INVARIANT_A`
 
@@ -132,7 +122,6 @@ As mentioned on the public documentation this suite framework spins around to ty
 - **Categories**: These postconditions can fall into two categories, the global postconditions and the handler-specific postconditions. The global postconditions (GPOST) are checked at the end of each test sequence using the `_after` hook, while the handler-specific postconditions (HSPOST) are checked at the end of specific handler calls.
 
 - **Example GPOST**: LENDING_GPOST_C
-
   - **Spec**: If totalSupply for a reserve increases new totalSupply must be less than or equal to supply cap.
   - **Implementation**: `DefaultBeforeAfterHooks::assert_LENDING_GPOST_C`
 
@@ -173,7 +162,6 @@ As mentioned on the public documentation this suite framework spins around to ty
     ```
 
 - **Example HSPOST**: E_MODE_HSPOST_G
-
   - **Spec**: The health factor of the user must be >= 1 after switch or leaving an emode.
   - **Implementation**: At the end of the `setUserEMode` handler, the postcondition is checked.
 
@@ -205,13 +193,11 @@ As mentioned on the public documentation this suite framework spins around to ty
 
 - **Overview**: As the public documentation states, handlers act as a kind of middleware layer between the tooling and the protocol. That is why when new features are added to the protocol or this one is upgraded, new handler functions must be either added or updated to support the new features. The following section will provide a detailed explanation of how to add support for new functions in handlers.
 - **Adding New Functions**: Let's take the example of the Aave v3.2 upgrade where a more granular version of the eMode feature was introduced. The new feature allows assets to be listed in multiple eModes removing `setAssetEModeCategory` function in favor of two more granular functions `setAssetCollateralInEMode` and `setAssetBorrowableInEMode`. The following steps show a guide through the process of adding support for these new functions in the handlers:
-
   - **Identify the Handler**: Determine which handler contract will be responsible for the new functions. In this case, the `PoolPermissionedHandler` handler is responsible for all the permissioned interactions with the protocol, so support the new functions should be added here.
 
-  - **Identify the parameters**: Determine which parameters are needed for the actions, which ones can be randomized, which ones should be clamped and which ones should be taken from a finite set like a helper storage array.+
+  - **Identify the parameters**: Determine which parameters are needed for the actions, which ones can be randomized, which ones should be clamped and which ones should be taken from a finite set like a helper storage array.
 
     In the case of the `setAssetCollateralInEMode` and `setAssetBorrowableInEMode` functions, the parameters are as follows:
-
     - `asset`: The address of the asset to be set in the eMode.
     - `eModeCategory`: The eMode category to set the asset to.
     - `allowed`: A boolean value to set if the asset is allowed in the eMode.
@@ -241,7 +227,6 @@ As mentioned on the public documentation this suite framework spins around to ty
     ```
 
     How a permissionless action would look like:
-
     - `eModeCategory` parameter is needed for the action, so a random eMode category can be selected from the helper storage array `ghost_categoryIds` using the `_getRandomEModeCategory` function.
     - Function should be called by an actor so the `setup` modifier and a proxied call to the protocol are used.
     - The function should be called between the `_before` and `_after` hooks to ensure values are cached for postconditions to be checked properly.
@@ -294,7 +279,6 @@ As mentioned on the public documentation this suite framework spins around to ty
 
 - **Overview**: Foundry unit and staless tests assertions are tightly related to handler specific postconditions, since both execute a determined action or set of actions and check for relationships and properties to hold after its executions. It is possible to migrate a big portion of these tests and assertions to the suite (some of the current postconditions already take inspiration on those), ensuring that the protocol is still being tested for the same properties and relationships between variables.
 - **Step-by-Step Migration**:
-
   1.  Identifying the action to migrate on both environments. For example, the `borrow` function.
   2.  Translating the Foundry assertions into postconditions or even invariants. For example on the test `test_variable_borrow` this common assertion `assertEq(balanceAfter, balanceBefore + borrowAmount);` can be translated to the following postcondition:
       `BORROWING_HSPOST_I: After a successful borrow the actor asset balance should increase by the amount borrowed`
